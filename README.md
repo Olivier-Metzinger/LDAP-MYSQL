@@ -2,5 +2,7 @@
 
 [Python]
 
-Sync et connection from MYSQL to LDAP using Openldap
+Function to add, modify, delete DN on a LDAP server.
+
+->Sync et connection from MYSQL to LDAP using Openldap
 
