@@ -5,28 +5,27 @@ import ldap
 import ldap.modlist
 import mysql.connector
 
-modlist = {
-    "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-    "uid": ["ff"],
-    "sn": ["cosani"],
-    "givenName": ["Moreno"],
-    "cn": ["Moreno COSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
-    "displayName": ["Moreno Cosani"],
-    "userPassword": ["root"],
-    "uidNumber": ["5000"],
-    "gidNumber": ["10000"],
-    "loginShell": ["/bin/bash"],
-    "homeDirectory": ["/home/moreno"]
-}
+
 row = 0
 load = 0
 mydb = 0
 
-def add_user(row):
-    global modlist
+def add_user(row, a):
+    modlist = {
+        "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
+        "uid": ["{}".format(a)],
+        "sn": ["{}".format(row[1])],
+        "givenName": ["Moreno"],
+        "cn": ["Moreno COSANI"],  ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
+        "displayName": ["Moreno Cosani"],
+        "userPassword": ["root"],
+        "uidNumber": ["5000"],
+        "gidNumber": ["10000"],
+        "loginShell": ["/bin/bash"],
+        "homeDirectory": ["/home/{}".format(row[1])]
+    }
+    dn = "uid={},ou=fafa,dc=roederer,dc=fr".format(a)                                            #MODIFIER LE DN (chemin)
 
-    print(row[0])
-    dn = "uid={},ou=Personnes,dc=roederer,dc=fr".format(row[0])                                            #MODIFIER LE DN (chemin)
     try:
         load.add_s(dn, ldap.modlist.addModlist(modlist))
         print("Utilisateur added")
@@ -48,19 +47,20 @@ def main():
         mydb = mysql.connector.connect(
             host="10.10.45.2",
             user="stagiaire",
-            passwd="DjfU78Fj76f65"
+            passwd="DjfU78Fj76f65",
+            db="RoedererEntreprises"
         )
         print("BDD connected!", mydb)
-        sql_select_Query = "SELECT * FROM RoedererEntreprises.SBYN_ENTERPRISE WHERE LID='C0272137'"
+        sql_select_Query = "SELECT SBYN_ENTERPRISE.SYSTEMCODE, SBYN_ENTERPRISE.LID, SBYN_ENTERPRISE.EUID, SBYN_ENTREPRISE_DETAIL.GESTIONNAIRE, SBYN_ENTREPRISE_DETAIL.ISACTIVE FROM SBYN_ENTERPRISE LEFT JOIN SBYN_ENTREPRISE_DETAIL  ON SBYN_ENTERPRISE.SYSTEMCODE = SBYN_ENTREPRISE_DETAIL.SYSTEMCODE AND SBYN_ENTERPRISE.LID = SBYN_ENTREPRISE_DETAIL.LID"
         cursor = mydb.cursor()
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
+        a=0
         for row in records:
-            print(row[0])
-            print(row[1])
-            print(row[2])
+            a = a + 1
+            add_user(row, a)
+            print(a)
         print("Total de rows : ", cursor.rowcount)
-        add_user(row)
     except:
         print("Erreur BDD (verifiez l'host, le user, ou le passwd...)")
 
