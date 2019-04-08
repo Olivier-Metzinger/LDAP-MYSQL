@@ -19,7 +19,7 @@ def main():
     try:
         global mydb
         mydb = mysql.connector.connect(
-            host="10.10.45.2",
+            host="",
             user="stagiaire",
             passwd=""
         )
