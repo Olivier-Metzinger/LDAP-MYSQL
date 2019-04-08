@@ -9,7 +9,7 @@ modlist = {
     "uid": ["moreno"],
     "sn": ["cosani"],
     "givenName": ["Moreno"],
-    "cn": ["Moreno COSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)
+    "cn": ["Moreno COSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
     "displayName": ["Moreno Cosani"],
     "userPassword": ["root"],
     "uidNumber": ["5000"],
@@ -64,9 +64,9 @@ def delete_user(load):
 
 def main():
     try:
-        load = ldap.initialize("ldap://127.0.0.1")
+        load = ldap.initialize("ldap://127.0.0.1")                                           #Modifier l'ip LDAP
         load.simple_bind_s("cn=admin,dc=roederer,dc=fr", "root")                             #utilisation du compte admin pour effectuer les modifs
-        delete_user(load)                                                                     #MODIFIER L'APPEL FONCTION POUR CHOISIR LA DEMARCHE A EFFECTUER
+        delete_user(load)                                                                    #MODIFIER L'APPEL FONCTION POUR CHOISIR LA DEMARCHE A EFFECTUER
     except ldap.LDAPError as e:
         print (e)
 
