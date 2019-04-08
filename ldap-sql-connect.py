@@ -21,7 +21,7 @@ def main():
         mydb = mysql.connector.connect(
             host="10.10.45.2",
             user="stagiaire",
-            passwd="DjfU78Fj76f65"
+            passwd=""
         )
         print("BDD connected!", mydb)
     except:
