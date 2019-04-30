@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import time
+
 import ldap
 import ldap.modlist
 import mysql.connector
@@ -9,20 +9,23 @@ import mysql.connector
 row = 0
 load = 0
 mydb = 0
+mdm = 0
 
 def add_user(row, a):
-
     modlist = {
         "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-        "uid": ["test"],
-        "createTimestamp": ["20190426085007Z"],
+        "uid": ["{}".format(a)],
+        "sn": ["{}".format(row[1])],
+        "givenName": ["Moreno"],
+        "cn": ["Moreno COSANI"],  ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
         "displayName": ["Moreno Cosani"],
         "userPassword": ["root"],
         "uidNumber": ["5000"],
         "gidNumber": ["10000"],
         "loginShell": ["/bin/bash"],
+        "homeDirectory": ["/home/{}".format(row[1])]
     }
-    dn = "uid=test,ou=People,dc=roederer,dc=fr"                                            #MODIFIER LE DN (chemin)
+    dn = "uid={},ou=fafa,dc=roederer,dc=fr".format(a)                                            #MODIFIER LE DN (chemin)
 
     try:
         load.add_s(dn, ldap.modlist.addModlist(modlist))
@@ -35,40 +38,35 @@ def main():
     try:
         global load
         global row
-        print("Connexion au LDAP...")
-        time.sleep(1)
         load = ldap.initialize("ldap://127.0.0.1")                      #Modifier l'ip LDAP
         load.simple_bind_s("cn=admin,dc=roederer,dc=fr", "root")
-        print ("LDAP connected!\nConnexion a la BDD...")
-        time.sleep(1)
+        print ("LDAP connected! Connexion a la BDD...")
     except ldap.LDAPError as e:
         print (e)
     try:
-        global mydb
-        mydb = mysql.connector.connect(
+
+        global mdm
+        mdm = mysql.connector.connect(
             host="10.10.45.2",
             user="stagiaire",
             passwd="DjfU78Fj76f65",
             db="RoedererEntreprises"
         )
         print("BDD connected!", mydb)
-        sql_select_Query = "SELECT * FROM RoedererEntreprises.SBYN_ENTERPRISE_DETAIL INNER JOIN TMP_SITEWEB_USER ON SBYN_ENTERPRISE_DETAIL.LID = TMP_SITEWEB_USER.LID WHERE SBYN_ENTERPRISE_DETAIL.GESTIONNAIRE = 'ROEDERER'"
-        cursor = mydb.cursor()
+        print("MDM connected!", mdm)
+        sql_select_Query = "SELECT SBYN_ENTERPRISE.SYSTEMCODE, SBYN_ENTERPRISE.LID, SBYN_ENTERPRISE.EUID, SBYN_ENTREPRISE_DETAIL.GESTIONNAIRE, SBYN_ENTREPRISE_DETAIL.ISACTIVE FROM SBYN_ENTERPRISE LEFT JOIN SBYN_ENTREPRISE_DETAIL  ON SBYN_ENTERPRISE.SYSTEMCODE = SBYN_ENTREPRISE_DETAIL.SYSTEMCODE AND SBYN_ENTERPRISE.LID = SBYN_ENTREPRISE_DETAIL.LID"
+        cursor = mdm.cursor()
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
         a=0
         for row in records:
             a = a + 1
-            print("------")
-            print(row[0])
-            print(row[1])
-            print(row[2])
-            print(row[6])
-        add_user(row, a)
-
-        print("Total de rows : ", cursor.rowcount)
+            print(row)
+            print(a)
     except:
-        print("Erreur BDD (verifiez l'host, le user, ou le passwd...)")
+        print("Erreur BDD ou MDM (verifiez l'host, le user, ou le passwd...)")
 
 
 main()
+
+

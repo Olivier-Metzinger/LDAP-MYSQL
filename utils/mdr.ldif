@@ -1,0 +1,4 @@
+dn: olcDatabase={0}config,cn=config
+changeType: modify
+add: olcAccess
+olcAccess: to * by dn.exact=cn=admin,dc=roederer,dc=fr manage by * break

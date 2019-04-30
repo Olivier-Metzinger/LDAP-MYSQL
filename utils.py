@@ -5,17 +5,20 @@ import ldap
 import ldap.modlist
 
 modlist = {
-    "objectClass": ["inetOrgPerson", "posixAccount", "shadowAccount"],
-    "uid": ["moreno"],
-    "sn": ["cosani"],
-    "givenName": ["Moreno"],
-    "cn": ["Moreno COSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
-    "displayName": ["Moreno Cosani"],
+    "objectClass": ["inetOrgPerson", "posixAccount"],
+    "uid": ["zmoreno"],
+    "sn": ["zcosani"],
+    "givenName": ["Mzoreno"],
+    "cn": ["Moreno zCOSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
+    "displayName": ["zMoreno Cosani"],
+
+    "zerzerzerzer": ["20190426085007Z"],
+
     "userPassword": ["root"],
-    "uidNumber": ["5000"],
-    "gidNumber": ["10000"],
+    "uidNumber": ["4000"],
+    "gidNumber": ["40000"],
     "loginShell": ["/bin/bash"],
-    "homeDirectory": ["/home/moreno"]
+    "homeDirectory": ["/home/moeno"]
 }
 
 ########## ajouter user ##########
@@ -23,7 +26,7 @@ modlist = {
 def add_user(load):
     global modlist
 
-    dn = "uid=moreno,ou=Personnes,dc=roederer,dc=fr"                                            #MODIFIER LE DN (chemin)
+    dn = "uid=zmoreno,ou=People,dc=roederer,dc=fr"                                            #MODIFIER LE DN (chemin)
     try:
         load.add_s(dn, ldap.modlist.addModlist(modlist))
         print("Utilisateur added")
@@ -37,10 +40,10 @@ def add_user(load):
 def modif_user(load):
     global modlist
 
-    dn = "uid=moreno,ou=Personnes,dc=roederer,dc=fr"
+    dn = "uid=moreno,ou=People,dc=roederer,dc=fr"
     try:
-        old_value = {"userPassword": ["ANCIEN MDP"]}                                            #MODIFIER LA CLASS ET TOUJOURS METTRE ANCIENNE VALEUR, PUIS NOUVELLE
-        new_value = {"userPassword": ["NOUVEAU MDP"]}
+        old_value = {"pwdAccountLockedTime": [""]}                                            #MODIFIER LA CLASS ET TOUJOURS METTRE ANCIENNE VALEUR, PUIS NOUVELLE
+        new_value = {"pwdAccountLockedTime": ["000001010000Z"]}
         modlist = ldap.modlist.modifyModlist(old_value, new_value)
         load.modify_s(dn, modlist)
         print("Valeur modifiee")
@@ -66,7 +69,7 @@ def main():
     try:
         load = ldap.initialize("ldap://127.0.0.1")                                           #Modifier l'ip LDAP
         load.simple_bind_s("cn=admin,dc=roederer,dc=fr", "root")                             #utilisation du compte admin pour effectuer les modifs
-        delete_user(load)                                                                    #MODIFIER L'APPEL FONCTION POUR CHOISIR LA DEMARCHE A EFFECTUER
+        add_user(load)                                                                    #MODIFIER L'APPEL FONCTION POUR CHOISIR LA DEMARCHE A EFFECTUER
     except ldap.LDAPError as e:
         print (e)
 
