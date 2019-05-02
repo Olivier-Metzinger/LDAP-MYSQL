@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import query
+import synchro
 import ldap
 import ldap.modlist
 import mysql.connector
@@ -26,7 +27,7 @@ def main():
         )
         print(load)
         print("BDD connected!", mydb)
-        query.query_up(mydb,load)
+        synchro.query(mydb,load)
     except AssertionError as error:
         print(error)
 
