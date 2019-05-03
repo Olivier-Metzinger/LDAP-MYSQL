@@ -1,15 +1,26 @@
 # coding=utf-8
+import os
 import ldap
+import smtplib
+import logging
 import ldap.modlist
 import mysql.connector
 from datetime import datetime
+from email.mime.text import MIMEText
 from ldap3 import Server, Connection, ALL, MODIFY_REPLACE
 
 
+def prYellow(skk): print("\033[96m {}\033[00m".format(skk))
+
+
 def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
-def prYellow(skk): print("\033[96m {}\033[00m" .format(skk))
+
+
 def prRed(skk): print("\033[91m {}\033[00m".format(skk))
 
+
+logging.basicConfig(filename='error_log.log', filemode='w', level=logging.DEBUG,
+                    format='%(asctime)s  --  %(pathname)s  --  %(message)s', datefmt='%a, %d %b %Y %H:%M:%S', )
 
 import time
 
@@ -30,22 +41,26 @@ def add_user(load, row, dn):
         "cn": ["{}".format(row[21].encode("utf-8"))],
         "sn": ["{}".format(row[21].encode("utf-8"))],
     }
-    #####A MODIFIER
     try:
         load.add_s(dn, ldap.modlist.addModlist(modlistadd))
         prGreen("Utilisateur ajouté : LID : {}".format(row[15]))
     except:
-        old_value = {"uid": [""], "Actif": [""], "DateFinActif": [""],
-                     "cn": [""], "sn": [""]}
+        try:
+            old_value = {"uid": [""], "Actif": [""], "DateFinActif": [""],
+                         "cn": [""], "sn": [""]}
 
-        new_value = {"uid": ["{}".format(row[14])], "Actif": ["1"],
-                     "DateFinActif": ["{}".format(row[19])],
-                     "cn": ["{}".format(row[21].encode("utf-8"))], "sn": ["{}".format(row[21].encode("utf-8"))]}
+            new_value = {"uid": ["{}".format(row[14])], "Actif": ["1"],
+                         "DateFinActif": ["{}".format(row[19])],
+                         "cn": ["{}".format(row[21].encode("utf-8"))], "sn": ["{}".format(row[21].encode("utf-8"))]}
 
-        modlist = ldap.modlist.modifyModlist(old_value, new_value)
-        load.modify_s(dn, modlist)
-        prGreen("Utilisateur modifié : LID : {}".format(row[15]))
+            modlist = ldap.modlist.modifyModlist(old_value, new_value)
+            load.modify_s(dn, modlist)
+            prGreen("Utilisateur modifié : LID : {}".format(row[15]))
+        except:
+            logging.error('Fail to ADD and/or MODIFY user LID:{LID} | NAME: {NAME}\n'.format(LID=row[15], NAME=row[21]))
 
+
+#############REQUÊTES ENTREPRISES ET ASSURÉS#######################
 
 def query(mydb, load):
     EntreprisesQuery = "SELECT * FROM RoedererEntreprises.SBYN_SYSTEMSBR INNER JOIN RoedererEntreprises.SBYN_ENTERPRISE ON SBYN_SYSTEMSBR.EUID = SBYN_ENTERPRISE.EUID INNER JOIN RoedererEntreprises.SBYN_ENTERPRISE_DETAIL ON SBYN_ENTERPRISE_DETAIL.LID = SBYN_ENTERPRISE.LID AND SBYN_ENTERPRISE_DETAIL.SYSTEMCODE = SBYN_ENTERPRISE.SYSTEMCODE WHERE SBYN_ENTERPRISE_DETAIL.SYSTEMCODE = 'AS400' AND SBYN_SYSTEMSBR.UPDATEDATE >= '{}'".format(
@@ -60,7 +75,7 @@ def query(mydb, load):
     cursor.execute(PersonnesQuery)
     records_Personnes = cursor.fetchall()
 
-####################################
+    #############LECTURE DES DONNÉES REQUÊTE##########################
 
     prRed("MODIFICATION ENTREPRISES")
     for row in records_Entreprises:
@@ -72,8 +87,6 @@ def query(mydb, load):
             continue
         add_user(load, row, dn)
 
-####################################
-
     prRed("MODIFICATION ASSURÉS")
     for row2 in records_Personnes:
         if (row2[17] == "ROEDERER"):
@@ -83,3 +96,16 @@ def query(mydb, load):
         else:
             continue
         add_user(load, row2, dn)
+    send_log()
+
+
+def send_log():
+    fp = open('error_log.log', 'rb')
+    msg = MIMEText(fp.read())
+    fp.close()
+    msg['Subject'] = 'ERROR SYNC LDAP'
+    msg['From'] = 'pole-web@roederer.fr'
+    msg['To'] = 'pole-web@roederer.fr'
+    if (os.stat("error_log.log").st_size) > 0:
+        server = smtplib.SMTP('10.10.44.148')
+        server.sendmail("pole-web@roederer.fr", "pole-web@roederer.fr", msg.as_string())
