@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2a6eeb99-b5cd-4bb7-92e9-e09834fadc89" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ldap-sql-connect.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/synchro.py" beforeDir="false" afterPath="$PROJECT_DIR$/synchro.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tempo.py" beforeDir="false" />
-    </list>
+    <list default="true" id="2a6eeb99-b5cd-4bb7-92e9-e09834fadc89" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/synchro.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="555">
-              <caret line="57" column="69" lean-forward="true" selection-start-line="48" selection-start-column="12" selection-end-line="57" selection-end-column="69" />
+            <state relative-caret-position="240">
+              <caret line="36" column="26" selection-start-line="36" selection-start-column="26" selection-end-line="36" selection-end-column="26" />
               <folding>
                 <element signature="e#15#24#0" expanded="true" />
               </folding>
@@ -90,17 +85,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="LDAP-MYSQL" type="b2602c69:ProjectViewProjectNode" />
-              <item name="LDAP-MYSQL" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -271,8 +256,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/synchro.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="57" column="69" lean-forward="true" selection-start-line="48" selection-start-column="12" selection-end-line="57" selection-end-column="69" />
+        <state relative-caret-position="240">
+          <caret line="36" column="26" selection-start-line="36" selection-start-column="26" selection-end-line="36" selection-end-column="26" />
           <folding>
             <element signature="e#15#24#0" expanded="true" />
           </folding>
