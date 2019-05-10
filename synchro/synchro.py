@@ -1,8 +1,6 @@
 # coding=utf-8
-import os
 import time
 import ldap
-import smtplib
 import logging
 import log_mail
 import variables
