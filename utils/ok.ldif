@@ -1,6 +1,0 @@
-dn: cn={4}roedererschema,cn=schema,cn=config
-changetype: modify
-add: olcObjectClasses
-olcObjectClasses: {0}( 1.3.6.1.4.1.42.2.27.4.2.1 NAME 'RoedererClass' DESC '
- Class de Roederer custom'SUP inetOrgPerson STRUCTURAL MAY (LID $ Actif $ Da
- teFinActif $ DateMajMdp $ MdpInitial $ IDGROUPE $ isAdminGroupe) )
