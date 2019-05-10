@@ -19,12 +19,12 @@ def prRed(skk): print("\033[91m {}\033[00m".format(skk))
 
 
 def query(mydb, server):
-    EntreprisesQuery = "SELECT s1.LID, s1.GESTIONNAIRE, s1.DTFIN, s1.ISACTIVE, s3.PASS, s1.RAISONSOCIALE AS NOM, s1.SYSTEMCODE, s2.EUID FROM RoedererEntreprises.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX' LIMIT 100;"
+    EntreprisesQuery = "SELECT s1.LID, s1.GESTIONNAIRE, s1.DTFIN, s1.ISACTIVE, s3.PASS, s1.RAISONSOCIALE AS NOM, s1.SYSTEMCODE, s2.EUID FROM RoedererEntreprises.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX';"
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(EntreprisesQuery)
     records_Entreprises = cursor.fetchall()
 
-    PersonnesQuery = "SELECT s1.LID, s1.SYSTEMCODE, s1.GESTIONNAIRE, s1.ISACTIVE, s3.PASS, s1.DTFIN, s1.NOM, s2.EUID FROM RoedererPersonnes.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN RoedererEntreprises.TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN RoedererPersonnes.SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX' LIMIT 100;"
+    PersonnesQuery = "SELECT s1.LID, s1.SYSTEMCODE, s1.GESTIONNAIRE, s1.ISACTIVE, s3.PASS, s1.DTFIN, s1.NOM, s2.EUID FROM RoedererPersonnes.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN RoedererEntreprises.TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN RoedererPersonnes.SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX';"
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(PersonnesQuery)
     records_Personnes = cursor.fetchall()
@@ -114,7 +114,8 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
 def main():
     prRed(
         "Ce script va créer les branches ROEDERER, SIMAX SANTÉ, SIMAX GESTION ainsi que leurs sous catégories Entreprises "
-        "et Assurés.\n\nCelui-ci va importer les données du MDM vers les groupes correspondants\n\nAppuyez sur 'o' pour lancer le script...")
+        ", Assurés ou apporteur.\n\nCelui-ci va importer les données du MDM vers les groupes correspondants.\n!! ATTENTION !! Ce script utilise des attributs personnalisés, "
+        "c'est pourquoi il faudra d'abord ajouter votre propre schéma et ses attributs dans votre LDAP\n\nAppuyez sur 'o' puis la touche entrée pour lancer le script...")
     while 1:
         key = raw_input("")
         if (key == 'o'):

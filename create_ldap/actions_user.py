@@ -26,7 +26,7 @@ def add_user(server, row, dn):
     result = result + 1
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistadd))
-        print("Utilisateur ajouté {} | {}".format(str(row['LID']), str(row['NOM'])))
+        print("Utilisateur ajouté {} | {}".format(str(row['LID'].encode("utf-8")), str(row['NOM'].encode("utf-8"))))
     except AssertionError as error:
         print(error)
 
@@ -34,11 +34,11 @@ def add_user(server, row, dn):
 def add_group(server, row, dn):
     modlistgroup = {
         "objectClass": ["organizationalUnit"],
-        "description": ["{}".format(str(row['NOM']))],
+        "description": ["{}".format(str(row['NOM'].encode("utf-8")))],
     }
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistgroup))
-        print("Groupe ajouté : {} | {}".format(str(row['LID']), str(row['NOM'])))
+        print("Groupe ajouté : {} | {}".format(str(row['LID']), str(row['NOM'].encode("utf-8"))))
     except AssertionError as error:
         print(error)
 
@@ -58,7 +58,7 @@ def add_apporteurs(server, row, dn):
     global result
     modlistapport = {
         "objectClass": ["RoedererClass", "inetOrgPerson"],
-        "LID": ["{}".format(str(row['LID']))],
+        "LID": ["{}".format(str(row['LID'].encode("utf-8")))],
         "Actif": ["1"],
         "userPassword": ["{}".format(str(row['PASS']))],
         "cn": ["{}".format(str(row['LID'].encode("utf-8")))],
@@ -67,6 +67,6 @@ def add_apporteurs(server, row, dn):
     result = result + 1
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistapport))
-        print("Appoteur ajouté {}".format(str(row['LID'])))
+        print("Appoteur ajouté {}".format(str(row['LID'].encode("utf-8"))))
     except AssertionError as error:
         print(error)
