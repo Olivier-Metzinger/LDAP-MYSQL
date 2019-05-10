@@ -6,75 +6,16 @@ import ldap.modlist
 import mysql.connector
 from datetime import datetime
 import time
-
-result = 0
+import actions_user
 
 
 def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
 
 
-def add_user(server, row, dn):
-    global result
-    date = datetime.now()
-    modlistadd = {
-        "objectClass": ["RoedererClass", "inetOrgPerson"],
-        "LID": ["{}".format(str(row['LID']))],
-        "uid": ["{}".format(str(row['EUID']))],
-        "Actif": ["1"],
-        "DateFinActif": ["{}".format(str(row['DTFIN']))],
-        "DateMajMdp": ["{}".format(date)],
-        "userPassword": ["{}".format(str(row['PASS']))],
-        "MdpInitial": ["Non"],
-        "cn": ["{}".format(str(row['NOM'].encode("utf-8")))],
-        "sn": ["{}".format(str(row['NOM'].encode("utf-8")))],
-    }
-    result = result + 1
-    try:
-        server.add_s(dn, ldap.modlist.addModlist(modlistadd))
-        print("User added")
-    except AssertionError as error:
-        print(error)
+def prYellow(skk): print("\033[96m {}\033[00m".format(skk))
 
 
-def add_group(server, row, dn):
-    modlistgroup = {
-        "objectClass": ["organizationalUnit"],
-        "description": ["{}".format(str(row['NOM']))],
-    }
-    try:
-        server.add_s(dn, ldap.modlist.addModlist(modlistgroup))
-        print("Group added")
-    except AssertionError as error:
-        print(error)
-
-
-def add_base(server, dn):
-    modlistbase = {
-        "objectClass": ["organizationalUnit"],
-    }
-    try:
-        server.add_s(dn, ldap.modlist.addModlist(modlistbase))
-        print("Group added")
-    except AssertionError as error:
-        print(error)
-
-
-def add_apporteurs(server, row, dn):
-    global result
-    modlistapport = {
-        "objectClass": ["RoedererClass", "inetOrgPerson"],
-        "LID": ["{}".format(str(row['LID']))],
-        "Actif": ["1"],
-        "userPassword": ["{}".format(str(row['PASS']))],
-        "cn": ["{}".format(str(row['LID'].encode("utf-8")))],
-        "sn": ["{}".format(str(row['LID'].encode("utf-8")))],
-    }
-    result = result + 1
-    try:
-        server.add_s(dn, ldap.modlist.addModlist(modlistapport))
-        print("user added")
-    except AssertionError as error:
-        print(error)
+def prRed(skk): print("\033[91m {}\033[00m".format(skk))
 
 
 def query(mydb, server):
@@ -96,38 +37,41 @@ def query(mydb, server):
     data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server)
 
 
-def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server):
+def add_structure():
     prGreen("CRÉATION DE L'ARBRE LDAP...")
     time.sleep(3)
     dn = "ou=Roederer,dc=roederer,dc=fr"
-    add_base(server, dn)
+    actions_user.add_base(server, dn)
     dn1 = "ou=Assurés,ou=Roederer,dc=roederer,dc=fr"
-    add_base(server, dn1)
+    actions_user.add_base(server, dn1)
     dn2 = "ou=Entreprises,ou=Roederer,dc=roederer,dc=fr"
-    add_base(server, dn2)
+    actions_user.add_base(server, dn2)
 
     dn3 = "ou=Simax Santé,dc=roederer,dc=fr"
-    add_base(server, dn3)
+    actions_user.add_base(server, dn3)
     dn4 = "ou=Assurés,ou=Simax Santé,dc=roederer,dc=fr"
-    add_base(server, dn4)
+    actions_user.add_base(server, dn4)
     dn5 = "ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr"
-    add_base(server, dn5)
+    actions_user.add_base(server, dn5)
 
     dn6 = "ou=Simax Gestion,dc=roederer,dc=fr"
-    add_base(server, dn6)
+    actions_user.add_base(server, dn6)
     dn7 = "ou=Apporteurs,ou=Simax Gestion,dc=roederer,dc=fr"
-    add_base(server, dn7)
+    actions_user.add_base(server, dn7)
 
+
+def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server):
+    add_structure()
     a = 0
     prGreen("CREATION DES GROUPES ENTREPRISES EN COURS...")
     time.sleep(3)
     for row_entreprises in records_Entreprises:
         if (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
             dn = "ou={},ou=Entreprises,ou=Roederer,dc=roederer,dc=fr".format(str(row_entreprises['LID']))
-            add_group(server, row_entreprises, dn)
+            actions_user.add_group(server, row_entreprises, dn)
         elif (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
             dn = "ou={},ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_entreprises['LID']))
-            add_group(server, row_entreprises, dn)
+            actions_user.add_group(server, row_entreprises, dn)
         else:
             continue
 
@@ -137,11 +81,11 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
         if (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
             dn = "LID={},ou={},ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_entreprises['LID']),
                                                                                        str(row_entreprises['LID']))
-            add_user(server, row_entreprises, dn)
+            actions_user.add_user(server, row_entreprises, dn)
         elif (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
             dn = "LID={},ou={},ou=Entreprises,ou=Roederer,dc=roederer,dc=fr".format(str(row_entreprises['LID']),
                                                                                     str(row_entreprises['LID']))
-            add_user(server, row_entreprises, dn)
+            actions_user.add_user(server, row_entreprises, dn)
         else:
             continue
         a = a + 1
@@ -151,10 +95,10 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
     for row_personnes in records_Personnes:
         if (row_personnes['GESTIONNAIRE'] == 'ROEDERER'):
             dn = "LID={},ou=Assurés,ou=Roederer,dc=roederer,dc=fr".format(str(row_personnes['LID']))
-            add_user(server, row_personnes, dn)
+            actions_user.add_user(server, row_personnes, dn)
         elif (row_personnes['GESTIONNAIRE'] == 'SIMAX'):
             dn = "LID={},ou=Assurés,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_personnes['LID']))
-            add_user(server, row_personnes, dn)
+            actions_user.add_user(server, row_personnes, dn)
         else:
             continue
         a = a + 1
@@ -162,12 +106,19 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
     time.sleep(3)
     for row_apporteurs in records_Apporteurs:
         dn = "LID={},ou=Apporteurs,ou=Simax Gestion,dc=roederer,dc=fr".format(str(row_apporteurs['LID']))
-        add_apporteurs(server, row_apporteurs, dn)
+        actions_user.add_apporteurs(server, row_apporteurs, dn)
         a = a + 1
-    print("Nombre totals d'users (entreprises + assurés + apporteurs", a)
+    prYellow("Nombre totals d'users (entreprises + personnes + apporteurs {}".format(a))
 
 
 def main():
+    prRed(
+        "Ce script va créer les branches ROEDERER, SIMAX SANTÉ, SIMAX GESTION ainsi que leurs sous catégories Entreprises "
+        "et Assurés.\n\nCelui-ci va importer les données du MDM vers les groupes correspondants\n\nAppuyez sur 'o' pour lancer le script...")
+    while 1:
+        key = raw_input("")
+        if (key == 'o'):
+            break
     try:
         global server
         print("Connexion au LDAP...")
