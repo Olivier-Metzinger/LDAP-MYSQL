@@ -12,6 +12,6 @@ def send_log_mail():
     msg['From'] = variables.FROM_mail
     msg['To'] = variables.TO_mail
 
-    if (os.stat("error_log.log").st_size) > 0:
-         mail = smtplib.SMTP('10.10.44.148')
-         mail.sendmail(variables.FROM_mail, variables.TO_mail, msg.as_string())
+    # if (os.stat("error_log.log").st_size) > 0:
+    #      mail = smtplib.SMTP(variables.SMTP)
+    #      mail.sendmail(variables.FROM_mail, variables.TO_mail, msg.as_string())

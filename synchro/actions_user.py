@@ -14,7 +14,7 @@ def add_group(server, row, dn):
     }
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistgroup))
-        prGreen("Groupe entreprise ajouté : LID : {}".format(row['LID']))
+        prGreen("Groupe entreprise ajouté : LID : {} | NOM : {} | GESTIONNAIRE : {}".format(str(row['LID']), str(row['NAME']), str(row['GESTIONNAIRE'])))
     except AssertionError as error:
         print(error)
 
@@ -34,10 +34,10 @@ def add_user(server, row, dn):
     }
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistadd))
-        prGreen("Utilisateur ajouté : LID : {}".format(row['LID']))
+        prGreen("Utilisateur ajouté : LID : {} | NOM : {} | GESTIONNAIRE : {}".format(str(row['LID']), str(row['NAME']), str(row['GESTIONNAIRE'])))
     except ldap.LDAPError,e:
         print(e)
-        logging.error('Fail to ADD and/or MODIFY user LID : {} | NAME : {}\n'.format(str(row['LID']), str(row['NAME'])))
+        logging.error('Fail to ADD and/or MODIFY user LID : {} | NAME : {} | GESTIONNAIRE : {}"\n'.format(str(row['LID']), str(row['NAME']), str(row['GESTIONNAIRE'])))
 
 
 def modify_user(server, row, dn):
@@ -58,7 +58,7 @@ def modify_user(server, row, dn):
         }
         modlist = ldap.modlist.modifyModlist(old_value, new_value)
         server.modify_s(dn, modlist)
-        prGreen("Utilisateur modifié : LID : {} | NAME : {}".format(str(row['LID']), str(row['NAME'])))
+        prGreen("Utilisateur modifié : LID : {} | NAME : {} | GESTIONNAIRE : {}".format(str(row['LID']), str(row['NAME']), str(row['GESTIONNAIRE'])))
     except ldap.LDAPError:
         logging.error(
             'Fail to ADD and/or MODIFY user LID : {} | NAME : {}\n'.format(str(row['LID']), str(row['NAME'])))

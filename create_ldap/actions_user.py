@@ -6,14 +6,12 @@ import ldap
 import logging
 from datetime import datetime
 
-result = 0
 
 def add_user(server, row, dn):
-    global result
     date = datetime.now()
     modlistadd = {
         "objectClass": ["RoedererClass", "inetOrgPerson"],
-        "LID": ["{}".format(str(row['LID']))],
+        "LID": ["{}".format(str(row['LID']))],                      #LISTE DES CLASS ET ATTRIBUTS POUR L'AJOUT UTILISATEUR
         "uid": ["{}".format(str(row['EUID']))],
         "Actif": ["1"],
         "DateFinActif": ["{}".format(str(row['DTFIN']))],
@@ -23,7 +21,6 @@ def add_user(server, row, dn):
         "cn": ["{}".format(str(row['NOM'].encode("utf-8")))],
         "sn": ["{}".format(str(row['NOM'].encode("utf-8")))],
     }
-    result = result + 1
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistadd))
         print("Utilisateur ajouté {} | {}".format(str(row['LID'].encode("utf-8")), str(row['NOM'].encode("utf-8"))))
@@ -34,7 +31,7 @@ def add_user(server, row, dn):
 def add_group(server, row, dn):
     modlistgroup = {
         "objectClass": ["organizationalUnit"],
-        "description": ["{}".format(str(row['NOM'].encode("utf-8")))],
+        "description": ["{}".format(str(row['NOM'].encode("utf-8")))],      #LISTE DES CLASS ET ATTRIBUTS POUR L'AJOUT GROUPE ENTREPRISE
     }
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistgroup))
@@ -48,25 +45,23 @@ def add_base(server, dn):
         "objectClass": ["organizationalUnit"],
     }
     try:
-        server.add_s(dn, ldap.modlist.addModlist(modlistbase))
+        server.add_s(dn, ldap.modlist.addModlist(modlistbase))          #LISTE POUR L'ARCHITECTURE DE BASE
         print("Branche ajoutée")
     except AssertionError as error:
         print(error)
 
 
 def add_apporteurs(server, row, dn):
-    global result
     modlistapport = {
         "objectClass": ["RoedererClass", "inetOrgPerson"],
         "LID": ["{}".format(str(row['LID'].encode("utf-8")))],
-        "Actif": ["1"],
+        "Actif": ["1"],                                                 #LISTE DES CLASS ET ATTRIBUTS POUR L'AJOUT APPORTEURS
         "userPassword": ["{}".format(str(row['PASS']))],
         "cn": ["{}".format(str(row['LID'].encode("utf-8")))],
         "sn": ["{}".format(str(row['LID'].encode("utf-8")))],
     }
-    result = result + 1
     try:
         server.add_s(dn, ldap.modlist.addModlist(modlistapport))
-        print("Appoteur ajouté {}".format(str(row['LID'].encode("utf-8"))))
+        print("Apporteur ajouté {}".format(str(row['LID'].encode("utf-8"))))
     except AssertionError as error:
         print(error)

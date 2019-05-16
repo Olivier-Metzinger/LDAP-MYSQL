@@ -1,139 +1,140 @@
 #!/usr/bin/python
 # coding=utf-8
 
-import ldap
-import ldap.modlist
-import mysql.connector
 from datetime import datetime
-import time
+import mysql.connector
 import actions_user
+import ldap.modlist
+import variables
+import ldap
+import time
 
 
 def prGreen(skk): print("\033[92m {}\033[00m".format(skk))
 
 
-def prYellow(skk): print("\033[96m {}\033[00m".format(skk))
+def prYellow(skk): print("\033[96m {}\033[00m".format(skk))  # Fonctions pour print en couleur
 
 
 def prRed(skk): print("\033[91m {}\033[00m".format(skk))
 
 
 def query(mydb, server):
-    EntreprisesQuery = "SELECT s1.LID, s1.GESTIONNAIRE, s1.DTFIN, s1.ISACTIVE, s3.PASS, s1.RAISONSOCIALE AS NOM, s1.SYSTEMCODE, s2.EUID FROM RoedererEntreprises.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX';"
+    # REQUÊTES ENTREPRISES, ASSURÉS, APPORTEURS (Fichier config)
+    EntreprisesQuery = variables.entreprises_query
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(EntreprisesQuery)
     records_Entreprises = cursor.fetchall()
 
-    PersonnesQuery = "SELECT s1.LID, s1.SYSTEMCODE, s1.GESTIONNAIRE, s1.ISACTIVE, s3.PASS, s1.DTFIN, s1.NOM, s2.EUID FROM RoedererPersonnes.SBYN_ENTERPRISE_DETAIL s1 INNER JOIN RoedererEntreprises.TMP_SITEWEB_USER s3 ON s1.LID = s3.LID INNER JOIN RoedererPersonnes.SBYN_ENTERPRISE s2 ON s1.LID = s2.LID AND s1.SYSTEMCODE = s2.SYSTEMCODE WHERE s1.SYSTEMCODE = 'AS400' AND s1.GESTIONNAIRE = 'ROEDERER' OR s1.GESTIONNAIRE = 'SIMAX';"
+    PersonnesQuery = variables.personnes_query
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(PersonnesQuery)
     records_Personnes = cursor.fetchall()
 
-    ApporteursQuery = "SELECT ID_USER AS LID, GESTIONNAIRE, PASS, TYPE_USER, LID FROM RoedererEntreprises.TMP_SITEWEB_USER WHERE TYPE_USER = 'app';"
+    ApporteursQuery = variables.apporteurs_query
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(ApporteursQuery)
     records_Apporteurs = cursor.fetchall()
 
+    add_structure(records_Entreprises, records_Personnes, records_Apporteurs, server)
+
+
+def add_structure(records_Entreprises, records_Personnes, records_Apporteurs, server):
+    prGreen("CRÉATION DE L'ARBRE LDAP...")
+    time.sleep(3)
+    # STRUCTURE ROEDERER
+    actions_user.add_base(server, variables.dn_roed)
+    actions_user.add_base(server, variables.dn_roed_ass)
+    actions_user.add_base(server, variables.dn_roed_entr)
+    # STRUCTURE SIMAX SANTÉ
+    actions_user.add_base(server, variables.dn_simax)
+    actions_user.add_base(server, variables.dn_simax_ass)  ##CREATION DE BASE DE L'ARBRE (VARIABLES.PY)
+    actions_user.add_base(server, variables.dn_simax_entr)
+    # STRUCTURE SIMAX GESTION
+    actions_user.add_base(server, variables.dn_simax_gestion)
+    actions_user.add_base(server, variables.dn_simax_gestion_app)
     data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server)
 
 
-def add_structure():
-    prGreen("CRÉATION DE L'ARBRE LDAP...")
-    time.sleep(3)
-    dn = "ou=Roederer,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn)
-    dn1 = "ou=Assurés,ou=Roederer,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn1)
-    dn2 = "ou=Entreprises,ou=Roederer,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn2)
-
-    dn3 = "ou=Simax Santé,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn3)
-    dn4 = "ou=Assurés,ou=Simax Santé,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn4)
-    dn5 = "ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn5)
-
-    dn6 = "ou=Simax Gestion,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn6)
-    dn7 = "ou=Apporteurs,ou=Simax Gestion,dc=roederer,dc=fr"
-    actions_user.add_base(server, dn7)
-
-
 def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server):
-    add_structure()
-    a = 0
+    compteur_ajout = 0
+
+    ##GROUPE ENTREPRISES##
     prGreen("CREATION DES GROUPES ENTREPRISES EN COURS...")
     time.sleep(3)
     for row_entreprises in records_Entreprises:
         if (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
-            dn = "ou={},ou=Entreprises,ou=Roederer,dc=roederer,dc=fr".format(str(row_entreprises['LID']))
+            dn = "ou={},".format(
+                str(row_entreprises['LID'])) + variables.dn_roed_entr
             actions_user.add_group(server, row_entreprises, dn)
-        elif (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
-            dn = "ou={},ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_entreprises['LID']))
-            actions_user.add_group(server, row_entreprises, dn)
-        else:
-            continue
 
+        elif (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
+            dn = "ou={},".format(
+                str(row_entreprises['LID'])) + variables.dn_simax_entr
+            actions_user.add_group(server, row_entreprises, dn)
+
+    ##UTILISATEURS DANS LE BON GROUPE ENTREPRISE
     prGreen("AJOUTS DES ENTREPRISES DANS LES GROUPES EN COURS...")
     time.sleep(3)
     for row_entreprises in records_Entreprises:
         if (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
-            dn = "LID={},ou={},ou=Entreprises,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_entreprises['LID']),
-                                                                                       str(row_entreprises['LID']))
+            dn = "LID={},ou={},".format(str(row_entreprises['LID']),
+                                        str(row_entreprises['LID'])) + variables.dn_simax_entr  # CRÉATION DES UTILISATEURS DANS LES BONS GROUPES ENTREPRISES
             actions_user.add_user(server, row_entreprises, dn)
         elif (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
-            dn = "LID={},ou={},ou=Entreprises,ou=Roederer,dc=roederer,dc=fr".format(str(row_entreprises['LID']),
-                                                                                    str(row_entreprises['LID']))
+            dn = "LID={},ou={},".format(str(row_entreprises['LID']),
+                                        str(row_entreprises['LID'])) + variables.dn_roed_entr
             actions_user.add_user(server, row_entreprises, dn)
         else:
-            continue
-        a = a + 1
+            var = LDAPError, e
+            print(var)
+        compteur_ajout = compteur_ajout + 1
 
+    ##UTILISATEURS ASSURÉS
     prGreen("ASSURÉS EN COURS...")
     time.sleep(3)
     for row_personnes in records_Personnes:
         if (row_personnes['GESTIONNAIRE'] == 'ROEDERER'):
-            dn = "LID={},ou=Assurés,ou=Roederer,dc=roederer,dc=fr".format(str(row_personnes['LID']))
-            actions_user.add_user(server, row_personnes, dn)
+            dn = "LID={},".format(str(row_personnes['LID'])) + variables.dn_roed_ass
+            actions_user.add_user(server, row_personnes, dn)  # CRÉATION DES ASSURÉS ROEDERER ET/OU SIMAX
         elif (row_personnes['GESTIONNAIRE'] == 'SIMAX'):
-            dn = "LID={},ou=Assurés,ou=Simax Santé,dc=roederer,dc=fr".format(str(row_personnes['LID']))
+            dn = "LID={},".format(str(row_personnes['LID'])) + variables.dn_simax_ass
             actions_user.add_user(server, row_personnes, dn)
         else:
-            continue
-        a = a + 1
+            var = LDAPError, e
+            print(var)
+        compteur_ajout = compteur_ajout + 1
+
+    ##UTILISATEURS APPORTEURS
     prGreen("APPORTEURS EN COURS...")
     time.sleep(3)
     for row_apporteurs in records_Apporteurs:
-        dn = "LID={},ou=Apporteurs,ou=Simax Gestion,dc=roederer,dc=fr".format(str(row_apporteurs['LID']))
+        dn = "LID={},".format(str(row_apporteurs['LID'])) + variables.dn_simax_gestion_app
         actions_user.add_apporteurs(server, row_apporteurs, dn)
-        a = a + 1
-    prYellow("Nombre totals d'users (entreprises + personnes + apporteurs {}".format(a))
+        compteur_ajout = compteur_ajout + 1
+    prYellow("Nombre total d'utilisateurs (entreprises + personnes + apporteurs {}".format(compteur_ajout))
 
 
 def main():
-    prRed(
-        "Ce script va créer les branches ROEDERER, SIMAX SANTÉ, SIMAX GESTION ainsi que leurs sous catégories Entreprises "
-        ", Assurés ou apporteur.\n\nCelui-ci va importer les données du MDM vers les groupes correspondants.\n!! ATTENTION !! Ce script utilise des attributs personnalisés, "
-        "c'est pourquoi il faudra d'abord ajouter votre propre schéma et ses attributs dans votre LDAP\n\nAppuyez sur 'o' puis la touche entrée pour lancer le script...")
+    prRed(variables.take_care)
     while 1:
         key = raw_input("")
-        if (key == 'o'):
+        if (key == 'o' or key == 'O'):
             break
     try:
         global server
         print("Connexion au LDAP...")
-        server = ldap.initialize("ldap://127.0.0.1")  # Modifier l'ip LDAP
-        server.simple_bind_s("cn=admin,dc=roederer,dc=fr", "root")
-        print("LDAP connected!\nConnexion a la BDD...")
+        server = ldap.initialize(variables.IP_ldap)  # CONNEXION LDAP ET BDD (fichier config "variables.py")
+        server.simple_bind_s(variables.CN_ldap, variables.MDP_ldap)
+        print("LDAP connected!\nConnexion à la BDD...")
     except:
         print("Error LDAP connection")
     try:
         mydb = mysql.connector.connect(
-            host="10.10.45.2",
-            user="stagiaire",
-            passwd="DjfU78Fj76f65",
-            db="RoedererEntreprises"
+            host=variables.DB_host,
+            user=variables.DB_user,
+            passwd=variables.DB_passwd,
+            db=variables.DB_DB
         )
         print("BDD connected!")
         query(mydb, server)
