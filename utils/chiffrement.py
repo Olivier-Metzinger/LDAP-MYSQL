@@ -1,37 +1,31 @@
-<?php
-function roederer_user_token_encrypt($data, $parameters = array()) {
-	$key = 'jBRsTvutzj9L18WNVS9y2zsSohcY8X13'; 
-	$iv = '3798562014659874'; 
-	$pwd = $data['uuid'].$data['timestamp']; 
-	$method = "AES-256-CBC"; 
-	// encode 
+def roederer_user_token_encrypt(data, parameters):
+	key = 'jBRsTvutzj9L18WNVS9y2zsSohcY8X13'
+	iv = '3798562014659874'
+	pwd = data['uuid'].data['timestamp']
+	method = "AES-256-CBC"
+	// encode
 
-	$hashedPwd = hash('sha512', $pwd); 
-	$ser = base64_encode(serialize($data)); 
+	$hashedPwd = hash('sha512', $pwd);
+	$ser = base64_encode(serialize($data));
 
-	$cipher = openssl_encrypt($ser, $method, $key, true, $iv); 
-	$bcipher = urlencode(base64_encode($cipher)); 
+	$cipher = openssl_encrypt($ser, $method, $key, true, $iv);
+	$bcipher = urlencode(base64_encode($cipher));
 
-	return 'pwd=' . $hashedPwd . '&token=' . $bcipher; 
-} 
+	return 'pwd=' . $hashedPwd . '&token=' . $bcipher;
+}
 
 function token_decrypt($pwd, $token) {
-	$key = 'jBRsTvutzj9L18WNVS9y2zsSohcY8X13'; 
-	$iv = '3798562014659874'; 
+	$key = 'jBRsTvutzj9L18WNVS9y2zsSohcY8X13';
+	$iv = '3798562014659874';
 	$method = 'AES-256-CBC';
-
 	$cipher = base64_decode(urldecode($token));
-
 	$serialized = openssl_decrypt($cipher, $method, $key, true, $iv);
-
 	$userData = unserialize(base64_decode($serialized));
 
-
 	$h2 = hash('sha512', $userData['uuid'].$userData['timestamp']);
+	$res = $pwd == $h2;
 
-	$res = $pwd == $h2; 
-
-	return array('auth' => $res, 'userData' => $userData); 
+	return array('auth' => $res, 'userData' => $userData);
 }
 
 //$data = array();

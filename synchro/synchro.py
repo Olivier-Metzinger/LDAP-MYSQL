@@ -24,6 +24,7 @@ logging.basicConfig(filename='error_log.log', filemode='w', level=logging.DEBUG,
 
 
 def query(mydb, server):
+    ##REQUETES DU FICHIER DE CONFIG
     EntreprisesQuery = variables.EntreprisesQuery
     cursor = mydb.cursor(dictionary=True)
     cursor.execute(EntreprisesQuery)
@@ -46,6 +47,7 @@ def data_to_ldap(records_Entreprises, records_Personnes, server):
             dn = variables.dn_simax_entr
         else:
             continue
+            ##VOIR AVEC MORENO##
         existing_entreprises(server, row_entreprises, dn)
 
     # RECUPERE LES ASSURÉS
