@@ -41,9 +41,9 @@ def data_to_ldap(records_Entreprises, records_Personnes, server):
     # RECUPERE LES ENTREPRISES
     prYellow("ENTREPRISES")
     for row_entreprises in records_Entreprises:
-        if (row_entreprises['GESTIONNAIRE'] == "ROEDERER"):
+        if (row_entreprises['GESTIONNAIRE'] == "ROED"):
             dn = variables.dn_roed_entr
-        elif (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
+        elif (row_entreprises['GESTIONNAIRE'] == 'SIM'):
             dn = variables.dn_simax_entr
         else:
             continue
@@ -53,9 +53,9 @@ def data_to_ldap(records_Entreprises, records_Personnes, server):
     # RECUPERE LES ASSURÉS
     prYellow("ASSURES")
     for row_personnes in records_Personnes:
-        if (row_personnes['GESTIONNAIRE'] == "ROEDERER"):
+        if (row_personnes['GESTIONNAIRE'] == "ROED"):
             dn = variables.dn_roed_ass
-        elif (row_personnes['GESTIONNAIRE'] == "SIMAX"):
+        elif (row_personnes['GESTIONNAIRE'] == "SIM"):
             dn = variables.dn_simax_ass
         else:
             continue
