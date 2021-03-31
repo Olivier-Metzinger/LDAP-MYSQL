@@ -42,15 +42,15 @@ def query(mydb, server):
 def add_structure(records_Entreprises, records_Personnes, records_Apporteurs, server):
     prGreen("CRÉATION DE L'ARBRE LDAP...")
     time.sleep(3)
-    # STRUCTURE ROEDERER
+    # STRUCTURE 
     actions_user.add_base(server, variables.dn_roed)
     actions_user.add_base(server, variables.dn_roed_ass)
     actions_user.add_base(server, variables.dn_roed_entr)
-    # STRUCTURE SIMAX SANTÉ
+    # STRUCTURE 
     actions_user.add_base(server, variables.dn_simax)
     actions_user.add_base(server, variables.dn_simax_ass)  ##CREATION DE BASE DE L'ARBRE (VARIABLES.PY)
     actions_user.add_base(server, variables.dn_simax_entr)
-    # STRUCTURE SIMAX GESTION
+    # STRUCTURE 
     actions_user.add_base(server, variables.dn_simax_gestion)
     actions_user.add_base(server, variables.dn_simax_gestion_app)
     data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server)
@@ -94,10 +94,10 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
     prGreen("ASSURÉS EN COURS...")
     time.sleep(3)
     for row_personnes in records_Personnes:
-        if (row_personnes['GESTIONNAIRE'] == 'ROEDERER'):
+        if (row_personnes['GESTIONNAIRE'] == 'ROED'):
             dn = "LID={},".format(str(row_personnes['LID'])) + variables.dn_roed_ass
             actions_user.add_user(server, row_personnes, dn)  # CRÉATION DES ASSURÉS ROEDERER ET/OU SIMAX
-        elif (row_personnes['GESTIONNAIRE'] == 'SIMAX'):
+        elif (row_personnes['GESTIONNAIRE'] == 'SIM'):
             dn = "LID={},".format(str(row_personnes['LID'])) + variables.dn_simax_ass
             actions_user.add_user(server, row_personnes, dn)
         else:
