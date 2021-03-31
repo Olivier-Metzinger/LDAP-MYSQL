@@ -31,7 +31,7 @@ dn_simax_entr = "ou=Entreprises,ou=Sim Santé,dc=roed,dc=fr"
 
 
 ##SIM##
-dn_simax_gestion = "ou=Sim,dc=roederer,dc=fr"
+dn_simax_gestion = "ou=Sim,dc=roed,dc=fr"
 dn_simax_gestion_app = "ou=Apporteurs,ou=Sim,dc=roed,dc=fr"
 
 ####CONFIG MAIL LOG####
