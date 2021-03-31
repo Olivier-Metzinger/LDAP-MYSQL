@@ -10,7 +10,7 @@ from datetime import datetime
 def add_user(server, row, dn):
     date = datetime.now()
     modlistadd = {
-        "objectClass": ["RoedererClass", "inetOrgPerson"],
+        "objectClass": ["ROEDECLASS", "inetOrgPerson"],
         "LID": ["{}".format(str(row['LID']))],                      #LISTE DES CLASS ET ATTRIBUTS POUR L'AJOUT UTILISATEUR
         "uid": ["{}".format(str(row['EUID']))],
         "Actif": ["1"],
@@ -53,7 +53,7 @@ def add_base(server, dn):
 
 def add_apporteurs(server, row, dn):
     modlistapport = {
-        "objectClass": ["RoedererClass", "inetOrgPerson"],
+        "objectClass": ["ROEDCLASS", "inetOrgPerson"],
         "LID": ["{}".format(str(row['LID'].encode("utf-8")))],
         "Actif": ["1"],                                                 #LISTE DES CLASS ET ATTRIBUTS POUR L'AJOUT APPORTEURS
         "userPassword": ["{}".format(str(row['PASS']))],
