@@ -21,7 +21,7 @@ def add_group(server, row, dn):
 def add_user(server, row, dn):
     date = datetime.now()
     modlistadd = {
-        "objectClass": ["RoedererClass", "inetOrgPerson"],
+        "objectClass": ["Roed", "inetOrgPerson"],
         "LID": ["{}".format(str(row['LID']))],
         "uid": ["{}".format(str(row['EUID']))],
         "Actif": ["1"],
