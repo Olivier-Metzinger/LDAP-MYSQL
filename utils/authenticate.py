@@ -9,13 +9,13 @@ if __name__ == "__main__":
     #CONFIG
     ldap_server = "ldap://127.0.0.1"
     login = "000000300"
-    password= "$S$DZkZYNO03CS3EmLfSQmnpiK/OWCS91QcpTVv6ru96ATu0WXi0HqL"
+    password= "pass"
 
     connect = ldap.initialize(ldap_server)
     # DN complet user
-    user_dn = "LID="+login+",ou=Assurés,ou=Roederer,dc=roederer,dc=fr"
+    user_dn = "LID="+login+",ou=Assurés,ou=roed,dc=roed,dc=fr"
     # DN de recherche (sans LID user)
-    base_dn = "ou=Assurés,ou=Roederer,dc=roederer,dc=fr"
+    base_dn = "ou=Assurés,ou=Roed,dc=roed,dc=fr"
     # filtre de recherche
     search_filter = "LID="+login
     try:
