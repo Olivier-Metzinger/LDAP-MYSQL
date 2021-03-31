@@ -16,13 +16,13 @@ DB_DB = "Roed"
 
 
 ####STRUCTURE LDAP####
-##ROEDERER##
+##dn_roed##
 dn_roed = "ou=roed,dc=roed,dc=fr"
 dn_roed_ass = "ou=Assurés,ou=Roed,dc=roed,dc=fr"
 dn_roed_entr = "ou=Entreprises,ou=Roed,dc=roed,dc=fr"
 
 
-##SIMAX SANTÉ##
+##dn_roed ##
 dn_simax = "ou=Sim,dc=roed,dc=fr"  # AJOUT STRUCTURE DE L'ARBRE
 dn_simax_ass = "ou=Assurés,ou=Sim,dc=roed,dc=fr"
 dn_simax_entr = "ou=Entreprises,ou=Sim,dc=roed,dc=fr"
