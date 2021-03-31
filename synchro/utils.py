@@ -6,13 +6,11 @@ import ldap.modlist
 
 modlist = {
     "objectClass": ["inetOrgPerson", "posixAccount"],
-    "uid": ["zmoreno"],
-    "sn": ["zcosani"],
-    "givenName": ["Mzoreno"],
-    "cn": ["Moreno zCOSANI"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
-    "displayName": ["zMoreno Cosani"],
-
-    "zerzerzerzer": ["20190426085007Z"],
+    "uid": ["NAME"],
+    "sn": ["SURNAME"],
+    "givenName": ["OLIVIER"],
+    "cn": ["OLIVIER MTZG"],                                                                ##MODIFIER LES STRINGS COMME BON VOUS SEMBLE (set en global)(class et value)
+    "displayName": ["OLIVIER MTZG"],
 
     "userPassword": ["root"],
     "uidNumber": ["4000"],
@@ -26,7 +24,7 @@ modlist = {
 def add_user(load):
     global modlist
 
-    dn = "uid=zmoreno,ou=People,dc=roederer,dc=fr"                                            #MODIFIER LE DN (chemin)
+    dn = "uid=OLIVIER,ou=People,dc=roed,dc=fr"                                            #MODIFIER LE DN (chemin)
     try:
         load.add_s(dn, ldap.modlist.addModlist(modlist))
         print("Utilisateur added")
@@ -40,7 +38,7 @@ def add_user(load):
 def modif_user(load):
     global modlist
 
-    dn = "uid=moreno,ou=People,dc=roederer,dc=fr"
+    dn = "uid=Olivier,ou=People,dc=roed,dc=fr"
     try:
         old_value = {"pwdAccountLockedTime": [""]}                                            #MODIFIER LA CLASS ET TOUJOURS METTRE ANCIENNE VALEUR, PUIS NOUVELLE
         new_value = {"pwdAccountLockedTime": ["000001010000Z"]}
@@ -57,7 +55,7 @@ def modif_user(load):
 
 def delete_user(load):
     try:
-        dn = "uid=Olivier,ou=Personnes,dc=roederer,dc=fr"                                              #MODIFIER LE DN
+        dn = "uid=Olivier,ou=Personnes,dc=roed,dc=fr"                                              #MODIFIER LE DN
         load.delete_s(dn)
         print("Supprime avez succes!")
     except:
@@ -68,7 +66,7 @@ def delete_user(load):
 def main():
     try:
         load = ldap.initialize("ldap://127.0.0.1")                                           #Modifier l'ip LDAP
-        load.simple_bind_s("cn=admin,dc=roederer,dc=fr", "root")                             #utilisation du compte admin pour effectuer les modifs
+        load.simple_bind_s("cn=admin,dc=roed,dc=fr", "root")                             #utilisation du compte admin pour effectuer les modifs
         add_user(load)                                                                    #MODIFIER L'APPEL FONCTION POUR CHOISIR LA DEMARCHE A EFFECTUER
     except ldap.LDAPError as e:
         print (e)
