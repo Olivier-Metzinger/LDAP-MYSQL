@@ -51,8 +51,8 @@ def add_structure(records_Entreprises, records_Personnes, records_Apporteurs, se
     actions_user.add_base(server, variables.dn_simax_ass)  ##CREATION DE BASE DE L'ARBRE (VARIABLES.PY)
     actions_user.add_base(server, variables.dn_simax_entr)
     # STRUCTURE 
-    actions_user.add_base(server, variables.dn_simax_gestion)
-    actions_user.add_base(server, variables.dn_simax_gestion_app)
+    actions_user.add_base(server, variables.dn_roed)
+    actions_user.add_base(server, variables.dn_roed)
     data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, server)
 
 
@@ -63,12 +63,12 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
     prGreen("CREATION DES GROUPES ENTREPRISES EN COURS...")
     time.sleep(3)
     for row_entreprises in records_Entreprises:
-        if (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
+        if (row_entreprises['GESTIONNAIRE'] == 'dn_roed'):
             dn = "ou={},".format(
                 str(row_entreprises['LID'])) + variables.dn_roed_entr
             actions_user.add_group(server, row_entreprises, dn)
 
-        elif (row_entreprises['GESTIONNAIRE'] == 'SIMAX'):
+        elif (row_entreprises['GESTIONNAIRE'] == 'dn_roed'):
             dn = "ou={},".format(
                 str(row_entreprises['LID'])) + variables.dn_simax_entr
             actions_user.add_group(server, row_entreprises, dn)
@@ -81,7 +81,7 @@ def data_to_ldap(records_Entreprises, records_Personnes, records_Apporteurs, ser
             dn = "LID={},ou={},".format(str(row_entreprises['LID']),
                                         str(row_entreprises['LID'])) + variables.dn_simax_entr  # CRÉATION DES UTILISATEURS DANS LES BONS GROUPES ENTREPRISES
             actions_user.add_user(server, row_entreprises, dn)
-        elif (row_entreprises['GESTIONNAIRE'] == 'ROEDERER'):
+        elif (row_entreprises['GESTIONNAIRE'] == 'dn_roed'):
             dn = "LID={},ou={},".format(str(row_entreprises['LID']),
                                         str(row_entreprises['LID'])) + variables.dn_roed_entr
             actions_user.add_user(server, row_entreprises, dn)
