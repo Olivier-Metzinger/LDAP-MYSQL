@@ -25,8 +25,8 @@ def index():
           print("NOP", sys.stdout)
 
 def token_decrypt(pwd, token):
-    key = 'jBRsTvutzj9L18WNVS9y2zsSohcY8X13'
-    iv = '3798562014659874'
+    key = 'key'
+    iv = 'iv'
     encrypted = base64.b64decode(unquote(token).decode('utf8'))
 
     cipher = AES.new(key,AES.MODE_CBC, iv)
