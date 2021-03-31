@@ -1,4 +1,4 @@
-def roederer_user_token_encrypt(data, parameters):
+def roed_user_token_encrypt(data, parameters):
 	key = 'key'
 	iv = 'iv'
 	pwd = data['uuid'].data['timestamp']
